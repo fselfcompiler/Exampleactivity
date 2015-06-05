@@ -1,5 +1,6 @@
 package com.example.rahulsk.exampleactivity;
 
+import android.graphics.Point;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -20,13 +21,17 @@ import android.provider.Settings;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class MainActivity extends Activity implements GooglePlayServicesClient.ConnectionCallbacks,GooglePlayServicesClient.OnConnectionFailedListener,LocationListener {
 
     LocationClient mLocationClient;
     Location mCurrentLocation;
     LocationRequest mLocationRequest;
-
     TextView txtLong,txtLat;
+    PrepareDummy_Data dummy_data;
+    Map<String, Points> mapping=new HashMap<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,6 +41,10 @@ public class MainActivity extends Activity implements GooglePlayServicesClient.C
         txtLong = (TextView) findViewById(R.id.txtLong);
         txtLat = (TextView) findViewById(R.id.txtLat);
 
+        //Rahul code
+
+        dummy_data=new PrepareDummy_Data();
+        mapping=dummy_data.get_mapping();
         // 3. create LocationClient
         mLocationClient = new LocationClient(this, this, this);
 
@@ -85,6 +94,7 @@ public class MainActivity extends Activity implements GooglePlayServicesClient.C
                 txtLat.setText(mCurrentLocation.getLatitude()+"");
                 txtLong.setText(mCurrentLocation.getLongitude()+"");
 
+
             }catch(NullPointerException npe){
 
                 Toast.makeText(this, "Failed to Connect", Toast.LENGTH_SHORT).show();
@@ -97,6 +107,7 @@ public class MainActivity extends Activity implements GooglePlayServicesClient.C
 
     }
 
+
     @Override
     public void onDisconnected() {
         Toast.makeText(this, "Disconnected.", Toast.LENGTH_SHORT).show();
@@ -108,9 +119,38 @@ public class MainActivity extends Activity implements GooglePlayServicesClient.C
         Toast.makeText(this, "Location changed.", Toast.LENGTH_SHORT).show();
         mCurrentLocation = mLocationClient.getLastLocation();
         txtLat.setText(mCurrentLocation.getLatitude()+"");
+        txtLong.setText(mCurrentLocation.getLongitude()+ "");
+        check_to_show_notification(new Points(mCurrentLocation.getLatitude(),mCurrentLocation.getLongitude()));
 
-        txtLong.setText(mCurrentLocation.getLongitude()+"");
     }
+
+    void check_to_show_notification(Points current_location)
+    {
+        for(Map.Entry<String,Points> m: mapping.entrySet())
+        {
+             if(isinrange(current_location,m.getValue()))
+             {
+                 Toast.makeText(getApplicationContext(),m.getKey(),Toast.LENGTH_LONG).show();
+                 return;
+             }
+        }
+        return;
+    }
+
+    boolean isinrange(Points current_location,Points store_location)
+    {
+        double threshhold_x=0.00001;
+        double threshhold_y=0.00001;
+        if((current_location.getx()+threshhold_x>=store_location.getx())&&(current_location.getx()-threshhold_x<=store_location.getx())) //X -coordinate
+        {
+            if((current_location.gety()+threshhold_y>=store_location.gety())&&(current_location.gety()-threshhold_y<=store_location.gety()))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
 
 
 
