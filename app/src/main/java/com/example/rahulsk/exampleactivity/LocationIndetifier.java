@@ -3,6 +3,7 @@ package com.example.rahulsk.exampleactivity;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -11,21 +12,30 @@ import java.util.List;
 public class LocationIndetifier {
     public static final int MAX_TIME = 5*60*60;
     public static Coordinates curr_location;
-    public static List<Coordinates> coordinates = new ArrayList<Coordinates>();
+    public static List<WIndowEntity> coordinates = new ArrayList<WIndowEntity>();
     public static long START_TIME = new Date().getTime();
     public static double distanceCovered;
 
     public static String findNearByPlace(Coordinates p){
         long curr_time = new Date().getTime();
         if(curr_time - START_TIME >= MAX_TIME){
-            START_TIME= new Date().getTime();
-            curr_location= coordinates.get(0);
-            coordinates.remove(0);
+            curr_location= coordinates.get(0).getP();
+            clearWindow(curr_time);
+            START_TIME = coordinates.get(0).getTime();
             return checkMovement(p);
         } else {
-            coordinates.add(p);
+            coordinates.add(new WIndowEntity(p,curr_time));
         }
         return "";
+    }
+
+    private static void clearWindow(long time){
+        Iterator<WIndowEntity> i = coordinates.iterator();
+        while(i.hasNext()){
+            if(time-i.next().getTime() > MAX_TIME){
+                i.remove();
+            }
+        }
     }
 
     private static String checkMovement(Coordinates p){
