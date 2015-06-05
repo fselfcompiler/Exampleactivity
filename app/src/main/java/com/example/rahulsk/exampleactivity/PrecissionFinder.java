@@ -12,8 +12,8 @@ public class PrecissionFinder {
     private static PrecissionFinder precissionFinder;
     Map<String , Coordinates> map = new HashMap<String, Coordinates>();
     private PrecissionFinder(){
-        Coordinates point1 = new Coordinates(77.6833214,12.932779);
-        Coordinates point2 = new Coordinates(77.683526,12.93309);
+        Coordinates point1 = new Coordinates(77.6833,12.9328);
+        Coordinates point2 = new Coordinates(77.6836,12.9330);
         map.put("NIKE", point1);
         map.put("LEVIS", point2);
 
@@ -31,7 +31,7 @@ public class PrecissionFinder {
         String  nearest = "";
         for(Map.Entry<String, Coordinates> m: map.entrySet()){
             Coordinates p = m.getValue();
-            double curr_dist = calculateDistance(p,point);
+            double curr_dist = LocationIndetifier.distance(p.getLat(),p.getLng(),point.getLat(),point.getLng());
             if( curr_dist < min_distance){
                 min_distance = curr_dist;
                 nearest = m.getKey();
@@ -40,9 +40,6 @@ public class PrecissionFinder {
      return nearest;
     }
 
-    private double calculateDistance(Coordinates p1, Coordinates p2){
-        return Math.sqrt(Math.pow((p2.getLat()-p1.getLat()),2.0)+Math.pow((p2.getLng()-p1.getLng()),2.0));
-    }
 
 
 }

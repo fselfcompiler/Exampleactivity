@@ -19,15 +19,16 @@ import android.os.Bundle;
 import android.provider.Settings;
 import android.widget.TextView;
 import android.widget.Toast;
+import java.text.DecimalFormat;
+import java.util.Date;
 
 public class MainActivity extends Activity implements GooglePlayServicesClient.ConnectionCallbacks,GooglePlayServicesClient.OnConnectionFailedListener,LocationListener {
 
     LocationClient mLocationClient;
     Location mCurrentLocation;
     LocationRequest mLocationRequest;
-
     TextView txtLong,txtLat;
-
+    double prev_time = new Date().getTime();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -104,14 +105,24 @@ public class MainActivity extends Activity implements GooglePlayServicesClient.C
 
     @Override
     public void onLocationChanged(Location location) {
-        Toast.makeText(this, "Location changed.", Toast.LENGTH_SHORT).show();
-        mCurrentLocation = mLocationClient.getLastLocation();
-        txtLat.setText(mCurrentLocation.getLatitude()+"");
-        txtLong.setText(mCurrentLocation.getLongitude()+"");
-        Toast.makeText(this, "You are at :"+
-                PrecissionFinder.getPrecissionFinder()
-                        .findNearByPlace(new Coordinates(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude())),Toast.LENGTH_LONG)
-                .show();
+        if (new Date().getTime() - prev_time >= 60*60){
+            prev_time = new Date().getTime();
+            Toast.makeText(this, "Location changed.", Toast.LENGTH_SHORT).show();
+            mCurrentLocation = mLocationClient.getLastLocation();
+            txtLat.setText(mCurrentLocation.getLatitude()+"");
+            txtLong.setText(mCurrentLocation.getLongitude()+"");
+            double lat = Double.parseDouble(new DecimalFormat("#0.0000").format(mCurrentLocation.getLatitude()));
+            double lng = Double.parseDouble(new DecimalFormat("#0.0000").format(mCurrentLocation.getLongitude()));
+            String locality = LocationIndetifier.
+                    findNearByPlace(new Coordinates(lat, lng));
+            if(!locality.equals("")){
+                Toast.makeText(this, "You are at : "+ locality +" and the distance is : "+LocationIndetifier.distanceCovered,Toast.LENGTH_LONG).show();
+            } else {
+                Toast.makeText(this, "Distance is big : "+ LocationIndetifier.distanceCovered,Toast.LENGTH_LONG).show();
+            }
+
+        }
+
     }
 
 
