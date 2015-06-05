@@ -80,7 +80,6 @@ public class MainActivity extends Activity implements GooglePlayServicesClient.C
             // get location
             mCurrentLocation = mLocationClient.getLastLocation();
             try{
-
                 // set TextView(s)
                 txtLat.setText(mCurrentLocation.getLatitude()+"");
                 txtLong.setText(mCurrentLocation.getLongitude()+"");
@@ -108,8 +107,11 @@ public class MainActivity extends Activity implements GooglePlayServicesClient.C
         Toast.makeText(this, "Location changed.", Toast.LENGTH_SHORT).show();
         mCurrentLocation = mLocationClient.getLastLocation();
         txtLat.setText(mCurrentLocation.getLatitude()+"");
-
         txtLong.setText(mCurrentLocation.getLongitude()+"");
+        Toast.makeText(this, "You are at :"+
+                PrecissionFinder.getPrecissionFinder()
+                        .findNearByPlace(new Coordinates(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude())),Toast.LENGTH_LONG)
+                .show();
     }
 
 
