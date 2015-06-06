@@ -1,5 +1,6 @@
 package com.example.rahulsk.exampleactivity;
 
+import android.graphics.Color;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -31,6 +32,8 @@ public class MainActivity extends Activity implements GooglePlayServicesClient.C
     LocationRequest mLocationRequest;
 
     TextView txtLong,txtLat;
+    String last_location_name=null;
+    String current_loc_name=null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -108,15 +111,32 @@ public class MainActivity extends Activity implements GooglePlayServicesClient.C
 
     @Override
     public void onLocationChanged(Location location) {
-        Toast.makeText(this, "Location changed.", Toast.LENGTH_SHORT).show();
-        mCurrentLocation = mLocationClient.getLastLocation();
-        txtLat.setText(mCurrentLocation.getLatitude()+"");
-        txtLong.setText(mCurrentLocation.getLongitude()+"");
-        Toast.makeText(this, "You are at :"+
-                PrecissionFinder.getPrecissionFinder()
-                        .findNearByPlace(new Coordinates(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude())),Toast.LENGTH_LONG)
-                .show();
-        Notify("You've received new message","rahul");
+
+
+            mCurrentLocation = mLocationClient.getLastLocation();
+
+            txtLat.setText(mCurrentLocation.getLatitude() + "");
+            txtLong.setText(mCurrentLocation.getLongitude() + "");
+            current_loc_name = PrecissionFinder.getPrecissionFinder()
+                    .findNearByPlace(new Coordinates(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude()));
+
+            if(current_loc_name==null)
+            {
+                last_location_name=null;
+                return ;
+            }
+
+            if (current_loc_name != null && last_location_name != current_loc_name) {
+                Toast.makeText(this, "Location changed  You are at :" + current_loc_name, Toast.LENGTH_LONG)
+                        .show();
+                last_location_name = current_loc_name;
+                Notify("You Have offers related to ", current_loc_name);
+
+            last_location_name = current_loc_name;
+
+
+        }
+
 
 
     }
@@ -126,6 +146,8 @@ public class MainActivity extends Activity implements GooglePlayServicesClient.C
         @SuppressWarnings("deprecation")
 
         Notification notification = new Notification(R.drawable.abc,"New Message", System.currentTimeMillis());
+        notification.color=Color.YELLOW;
+
         Intent notificationIntent = new Intent(this,NotificationView.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0,notificationIntent, 0);
 
